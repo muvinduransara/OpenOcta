@@ -1,0 +1,81 @@
+/*
+  Arduino Nano MIDI Octapad
+  8 Piezo Pads
+  Baud: 115200
+  Use Hairless MIDI + loopMIDI
+*/
+
+const byte NUM_PADS = 8;
+
+const byte padPin[NUM_PADS] = {
+  A0, A1, A2, A3,
+  A4, A5, A6, A7
+};
+
+// MIDI Notes
+const byte midiNote[NUM_PADS] = {
+  36, // Kick
+  38, // Snare
+  42, // Closed Hat
+  46, // Open Hat
+  45, // Tom1
+  47, // Tom2
+  49, // Crash
+  51  // Ride
+};
+
+const int threshold = 60;
+const int maxValue = 800;
+
+unsigned long lastHit[NUM_PADS];
+
+const int retrigger = 70; // milliseconds
+
+void noteOn(byte note, byte velocity)
+{
+  Serial.write(0x99);     // Channel 10
+  Serial.write(note);
+  Serial.write(velocity);
+}
+
+void noteOff(byte note)
+{
+  Serial.write(0x89);
+  Serial.write(note);
+  Serial.write((byte)0);
+}
+
+void setup()
+{
+  Serial.begin(115200);
+}
+
+void loop()
+{
+  for(byte i=0;i<NUM_PADS;i++)
+  {
+    int value = analogRead(padPin[i]);
+
+    if(value > threshold)
+    {
+      if(millis() - lastHit[i] > retrigger)
+      {
+        byte velocity = map(value,
+                            threshold,
+                            maxValue,
+                            20,
+                            127);
+
+        velocity = constrain(velocity,20,127);
+
+        noteOn(midiNote[i],velocity);
+
+        delay(8);
+
+        noteOff(midiNote[i]);
+
+        lastHit[i]=millis();
+      }
+    }
+  }
+}
