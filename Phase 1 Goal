@@ -1,11 +1,354 @@
-By the end of Phase 1 we should have:
+    ├── Step 1 - Project Foundation
+    ├── Step 2 - System Requirements (SRS)
+    ├── Step 3 - Component Selection
+    ├── Step 4 - System Architecture
+    ├── Step 5 - Circuit Design
+    ├── Step 6 - Breadboard Prototype
+    ├── Step 7 - Firmware
+    ├── Step 8 - USB MIDI Test
+    ├── Step 9 - Phase 1 Complete ✅
 
-✅ 8 working drum pads
 
-✅ USB MIDI communication
+Phase 1 is considered complete when:
 
-✅ Laptop recognizes OpenOcta as a MIDI device
+✅ All 8 pads work.
+✅ Laptop detects OpenOcta as a USB MIDI device.
+✅ Every pad sends the correct MIDI note.
+✅ Velocity changes with playing strength.
+✅ Drum sounds can be played in FL Studio, Ableton, Reaper, etc.
 
-✅ Works with FL Studio, Ableton, Reaper, etc.
 
-✅ Velocity-sensitive playing
+Phase 2
+  OLED Display
+  RGB LEDs
+  Settings Menu
+
+Phase 3
+  Bluetooth MIDI
+  Mobile App
+
+Phase 4
+  Desktop Configurator
+  Firmware Update
+  Presets
+
+
+
+
+
+
+Step 1 - Project Foundation
+------------------------------------------------------------------------------------------------------------------
+
+02. By the end of Phase 1 we should have:
+
+    ✅ 8 working drum pads
+    ✅ USB MIDI communication
+    ✅ Laptop recognizes OpenOcta as a MIDI device
+    ✅ Works with FL Studio, Ableton, Reaper, etc.
+    ✅ Velocity-sensitive playing
+
+
+03. 📂 Official Project Structure
+
+    OpenOcta/
+    │
+    ├── README.md
+    ├── LICENSE
+    ├── CHANGELOG.md
+    │
+    ├── Docs/
+    │   ├── SRS/
+    │   ├── Architecture/
+    │   ├── Testing/
+    │   └── Images/
+    │
+    ├── Hardware/
+    │   ├── Circuit/
+    │   ├── PCB/
+    │   ├── Enclosure/
+    │   └── BOM/
+    │
+    ├── Firmware/
+    │   ├── Core/
+    │   ├── Drivers/
+    │   ├── MIDI/
+    │   ├── USB/
+    │   └── Utils/
+    │
+    ├── Software/
+    │   ├── Desktop/
+    │   └── Mobile/
+    │
+    ├── Assets/
+    │
+    └── Media/
+
+
+Step 2 - System Requirements (SRS)
+------------------------------------------------------------------------------------------------------------------
+
+Project Objectives
+
+✅ Build an 8-pad MIDI Octapad
+✅ Detect drum hits accurately
+✅ Calculate hit velocity
+✅ Send USB MIDI messages
+✅ Work on Windows, macOS and Linux
+✅ Low latency
+✅ Stable firmware
+
+
+3. System Scope
+
+✔ 8 Drum Pads
+✔ Piezo Sensors
+✔ ESP32-S3
+✔ USB MIDI
+✔ Velocity Detection
+✔ Laptop Connection
+✔ MIDI Note Mapping
+✔ Threshold Adjustment (Firmware)
+✔ Sensitivity Adjustment (Firmware)
+
+
+4. Functional Requirements
+
+FR-01 - The system shall detect hits on every pad.
+FR-02 - The system shall determine which pad was struck.
+FR-03 - The system shall calculate hit velocity.
+FR-04 - The system shall convert the hit into a MIDI Note On message.
+FR-05 - The system shall transmit MIDI over USB.
+FR-06 - The system shall send MIDI Note Off automatically.
+FR-07 - Each pad shall have its own MIDI note.
+
+Example:
+
+Pad	MIDI Note
+1	36
+2	38
+3	42
+4	46
+5	49
+6	51
+7	48
+8	43
+FR-08 - The system shall continuously scan all pads.
+FR-09 - The firmware shall ignore electrical noise.
+FR-10 - The system shall operate continuously without restarting.
+
+
+5. Non-Functional Requirements
+
+Performance
+  Latency < 10 ms (target)
+  Fast response
+  Smooth playing
+
+Reliability
+  No random notes
+  Stable USB connection
+  Stable firmware
+
+Maintainability
+  Modular code
+  Easy debugging
+  Easy updates
+
+Portability
+  Must work on: Windows / macOS / Linux
+
+
+6. Hardware Requirements
+
+| Component                | Quantity |
+| ------------------------ | -------- |
+| ESP32-S3                 | 1        |
+| Piezo Sensors            | 8        |
+| Resistors                | Required |
+| Diodes (if needed)       | Required |
+| USB-C Connector          | 1        |
+| Prototype PCB/Breadboard | 1        |
+| EVA Foam                 | 8        |
+| Rubber Pad Surface       | 8        |
+
+
+7. Software Requirements
+
+Development
+  Arduino IDE or PlatformIO
+  Git
+  GitHub
+
+Testing
+  MIDI-OX (Windows)
+  MIDI Monitor (macOS)
+  FL Studio / Reaper / Ableton Live
+
+
+8. Performance Requirements
+
+| Item            | Target          |
+| --------------- | --------------- |
+| Scan Rate       | >1000 scans/sec |
+| MIDI Latency    | <10 ms          |
+| Missed Hits     | 0 (normal use)  |
+| False Triggers  | Very Low        |
+| Velocity Levels | 1–127           |
+
+
+9. Constraints
+
+Low-cost components
+Open-source software
+USB powered
+Easy to build
+Beginner-friendly hardware
+
+
+Step 3: Component Selection + System Architecture
+------------------------------------------------------------------------------------------------------------------
+
+1. FINAL SYSTEM ARCHITECTURE (Future-proof)
+
+
+        [ Drum Pads x8 ]
+               |
+        Piezo Sensor Array
+               |
+        Signal Conditioning
+ (Resistors + Protection + Filtering)
+               |
+        Analog Inputs (ADC)
+               |
+        ┌─────────────────────┐
+        │     ESP32-S3        │
+        │  (Main Controller)  │
+        │                     │
+        │ - ADC Processing    │
+        │ - Velocity Engine   │
+        │ - MIDI Engine       │
+        │ - USB MIDI Stack    │
+        │ - BLE MIDI (future) │
+        └─────────┬───────────┘
+                  |
+        ┌─────────┴───────────┐
+        │                     │
+   USB MIDI             Bluetooth MIDI (future)
+        │                     │
+     Laptop / DAW        Mobile / Tablet
+
+
+2. CORE DESIGN DECISIONS (IMPORTANT)
+🧠 ESP32-S3
+
+🥁 3. PAD SYSTEM DESIGN
+
+[Piezo Disc]
+     |
+     +----> 1MΩ Resistor (bleed)
+     |
+     +----> 1N4148 Diode (protection)
+     |
+     +----> 10k Resistor (series protection)
+     |
+     +----> ESP32 ADC pin
+
+🎯 Why this design?
+
+✔ Prevents ADC damage
+✔ Reduces noise spikes
+✔ Stable velocity reading
+✔ Cheap components
+✔ Scalable to 16 pads later
+
+4. POWER DESIGN
+
+USB Powered System
+Input: USB-C 5V
+Regulation: 3.3V LDO
+Recommended regulator:
+
+🔋 AMS1117-3.3 (basic)
+OR (better)
+
+🔋 AP2112K (low noise, stable)
+
+5. COMPONENT SELECTION
+
+🧠 Main Controller
+ESP32-S3 DevKitC-1
+
+🥁 Drum Sensing
+Piezo Disc Sensors × 8
+1MΩ resistors × 8
+10k resistors × 8
+1N4148 diodes × 8
+
+🔌 Power Section
+USB-C Connector
+5V to 3.3V Regulator (AP2112K recommended)
+Capacitors:
+10µF × 2
+0.1µF × 8 (decoupling)
+
+
+6. GPIO MAPPING
+
+| Pad   | GPIO   |
+| ----- | ------ |
+| Pad 1 | GPIO 1 |
+| Pad 2 | GPIO 2 |
+| Pad 3 | GPIO 3 |
+| Pad 4 | GPIO 4 |
+| Pad 5 | GPIO 5 |
+| Pad 6 | GPIO 6 |
+| Pad 7 | GPIO 7 |
+| Pad 8 | GPIO 8 |
+
+
+7. FUTURE-PROOF DESIGN RULES
+
+Rule 1
+PCB must support:
+  8 pads now
+  16 pads later (expansion header)
+
+Rule 2
+Leave space for:
+  OLED display
+  RGB controller
+  Bluetooth antenna
+Rule 3
+Firmware modular:
+  MIDI Engine
+  Pad Scanner
+  ADC Handler
+  Velocity Calculator
+  USB Layer
+  BLE Layer (future
+
+
+Step 4: Circuit Design (REAL ENGINEERING TIME)
+------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
