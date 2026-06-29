@@ -1,0 +1,11 @@
+By the end of Phase 1 we should have:
+
+✅ 8 working drum pads
+
+✅ USB MIDI communication
+
+✅ Laptop recognizes OpenOcta as a MIDI device
+
+✅ Works with FL Studio, Ableton, Reaper, etc.
+
+✅ Velocity-sensitive playing
